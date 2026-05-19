@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barèmes & Compagnies — Groupe Financier Signature</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #4f7ef8;
+    --accent2: #7c3aed;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 16px; height: 60px; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { font-weight: 700; font-size: 1.05rem; color: var(--accent); white-space: nowrap; }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; flex: 1; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.78rem; padding: 6px 10px; border-radius: 6px; white-space: nowrap; transition: all .15s; }
+  .nav-links a:hover { background: var(--surface2); color: var(--text); }
+
+  main { max-width: 1300px; margin: 0 auto; padding: 32px 20px; }
+  .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+  .page-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 36px; }
+
+  .company { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 32px; overflow: hidden; scroll-margin-top: 80px; }
+  .company-header { padding: 20px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); }
+  .co-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
+  .co-name { font-size: 1.25rem; font-weight: 700; }
+  .co-type { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; font-weight: 600; margin-left: 8px; }
+  .badge-mutual { background: #1e3a5f; color: #60a5fa; }
+  .badge-stock { background: #1e2d1e; color: #86efac; }
+
+  .company-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media(max-width: 900px) { .company-body { grid-template-columns: 1fr; } }
+
+  .company-body > * { padding: 20px 24px; border-right: 1px solid var(--border); }
+  .company-body > *:last-child { border-right: none; }
+  .company-body .full-width { grid-column: 1 / -1; border-right: none; border-top: 1px solid var(--border); }
+  .company-body .three-cols { grid-column: 1 / -1; border-right: none; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  @media(max-width: 900px) { .company-body .three-cols { grid-template-columns: 1fr; } }
+  .company-body .three-cols > * { padding: 16px 20px; border-right: 1px solid var(--border); }
+  .company-body .three-cols > *:last-child { border-right: none; }
+
+  .section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 14px; }
+  .section-subtitle { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent2); margin-bottom: 10px; margin-top: 18px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(46,51,80,0.5); }
+  tr:last-child td { border-bottom: none; }
+  .rate { font-weight: 700; color: var(--accent); }
+  .sub-row { color: var(--muted); font-size: 0.78rem; }
+
+  ul.pts { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.pts li { display: flex; gap: 8px; font-size: 0.84rem; line-height: 1.4; align-items: flex-start; }
+  ul.pts li::before { font-size: 0.75rem; flex-shrink: 0; margin-top: 2px; }
+  ul.pts.forts li::before { content: '✓'; color: var(--green); font-weight: 700; }
+  ul.pts.faibles li::before { content: '✗'; color: var(--red); font-weight: 700; }
+
+  .note { background: rgba(79,126,248,0.07); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+  .c-assomption { background: #1a2c4e; color: #60a5fa; }
+  .c-bmo        { background: #1a2535; color: #7dd3fc; }
+  .c-canadavie  { background: #1e3b2e; color: #6ee7b7; }
+  .c-empire     { background: #3b1f2b; color: #f9a8d4; }
+  .c-equitable  { background: #1e2f4a; color: #93c5fd; }
+  .c-humania    { background: #2d2320; color: #fdba74; }
+  .c-ia         { background: #1e273b; color: #a5b4fc; }
+  .c-manulife   { background: #1a2e1a; color: #86efac; }
+  .c-uv         { background: #2d1e3e; color: #d8b4fe; }
+  .c-beneva     { background: #1e2a2d; color: #67e8f9; }
+  .c-sunlife    { background: #2e2410; color: #fcd34d; }
+  .c-rbc        { background: #2e1010; color: #fca5a5; }
+
+  .highlight { color: var(--yellow); font-weight: 600; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .legend-item { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-size: 0.75rem; color: var(--muted); }
+  .legend-item strong { color: var(--text); }
+
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">GFS — Barèmes</span>
+  <div class="nav-links">
+    <a href="#assomption">Assomption</a>
+    <a href="#bmo">BMO</a>
+    <a href="#canadavie">Canada Vie</a>
+    <a href="#empire">Empire Vie</a>
+    <a href="#equitable">Équitable</a>
+    <a href="#humania">Humania</a>
+    <a href="#ia">IA</a>
+    <a href="#manulife">Manulife</a>
+    <a href="#uv">UV Assurance</a>
+    <a href="#beneva">Beneva</a>
+    <a href="#sunlife">Sun Life</a>
+    <a href="#rbc">RBC</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-title">Barèmes de commissions &amp; profils assureurs</div>
+  <div class="page-sub">Groupe Financier Signature — Frédérik Dubé · Mis à jour mai 2026</div>
+
+  <div class="legend">
+    <div class="legend-item"><strong>CB5</strong> — Commission à escompte 5 ans (reprise 5 ans)</div>
+    <div class="legend-item"><strong>CB3</strong> — Commission à escompte 3 ans</div>
+    <div class="legend-item"><strong>Suivi</strong> — Trailer / commission de renouvellement annuelle</div>
+    <div class="legend-item"><strong>APUI / ODE</strong> — Ajouts de prime (PAR)</div>
+    <div class="legend-item"><strong>Récu.</strong> — Récupération (chargeback)</div>
+    <div class="legend-item"><strong>PAR</strong> — Vie participante · <strong>VU</strong> — Vie universelle</div>
+    <div class="legend-item"><strong>MG</strong> — Maladies graves · <strong>DI</strong> — Invalidité</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       ASSOMPTION VIE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="assomption">
+    <div class="company-header">
+      <div class="co-icon c-assomption">AV</div>
+      <div>
+        <div class="co-name">Assomption Vie <span class="badge badge-mutual">Mutuelle</span></div>
+        <div class="co-type">Fonds distincts · CPE · Assurance individuelle · Est. 1903 · Moncton NB</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–5 / 6+</th></tr>
+          <tr><td>Vie Entière (Vie entière non participante)</td><td class="rate">45 %</td><td>— / 2 %</td></tr>
+          <tr><td>FlexTerm T10</td><td class="rate">40 %</td><td>2 % / 2 %</td></tr>
+          <tr><td>FlexTerm T20</td><td class="rate">45 %</td><td>2 % / 2 %</td></tr>
+          <tr><td>FlexTerm T30</td><td class="rate">50 %</td><td>2 % / 2 %</td></tr>
+          <tr><td>ParPlus (PAR — paiements à vie)</td><td class="rate">55 %</td><td>— / 2 %</td></tr>
+          <tr><td>ParPlus 20 paiements / ParPlus Junior</td><td class="rate">50 %</td><td>— / 2 %</td></tr>
+          <tr><td>Protection Vitale MG (T75 / T75 20 pmts)</td><td class="rate">50 %</td><td>4 % / 3 %</td></tr>
+          <tr><td>Rente d'invalidité (DI)</td><td class="rate">35 %</td><td>2,4 % / 1,6 %</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois linéaire (100 % → 0 %)</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · Fonds distincts (FundSERV) —</div>
+        <table>
+          <tr><th>Option</th><th>Commission initiale</th><th>Suivi annuel</th></tr>
+          <tr><td>CB5 — Actions/Équilibrés (75/75 &amp; 75/100)</td><td class="rate">5,20 %</td><td class="rate">0,45 %</td></tr>
+          <tr><td class="sub-row">Suivi dès le 1er mois</td><td class="highlight" colspan="2">Rendement effectif an 1 ≈ 5,65 %</td></tr>
+          <tr><td>CB3 — Actions/Équilibrés</td><td class="rate">3,75 %</td><td>0,52 %</td></tr>
+          <tr><td>Renouvellement élevé (haut trailer)</td><td class="rate">0 %</td><td class="rate">1,05 – 1,15 %</td></tr>
+          <tr><td>Revenu fixe (CB5)</td><td class="rate">2,60 %</td><td>0,225 %</td></tr>
+          <tr><td>CPE (enregistré, 75/100 série G) CB5</td><td class="rate">5,20 %</td><td>0,45 %</td></tr>
+          <tr><td>CPE CB3 (FHSA — obligatoire)</td><td class="rate">3,75 %</td><td>0,70 %</td></tr>
+          <tr><td class="sub-row">Récupération FDs</td><td class="sub-row" colspan="2">CB5 : 5 ans (100 % → 0 %) · CB3 : 3 ans · Suivi : aucune reprise</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Bonification PSERIOS (dépôts nets) —</div>
+        <table>
+          <tr><th>Seuil annuel</th><th>Boni</th></tr>
+          <tr><td>25 000 $ – 34 999 $</td><td class="rate">0,50 %</td></tr>
+          <tr><td>50 000 $ – 74 999 $</td><td class="rate">0,75 %</td></tr>
+          <tr><td>100 000 $ +</td><td class="rate">1,25 %</td></tr>
+          <tr><td>Boni Momentum courtier (CANPA ≥ 10 000 $, 5 polices)</td><td class="rate">15 – 30 %</td></tr>
+          <tr><td>Remises client dès 50 000 $</td><td class="rate">10 bps sur 250 k$+</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li>CB5 à 5,20 % + trailer 0,45 % dès mois 1 = <strong>5,65 % effectif an 1</strong>, l'un des meilleurs en industrie</li>
+          <li>PAR ParPlus à <strong>55 %</strong> an 1 (paiements à vie) — commission participante très compétitive</li>
+          <li>CPE pour comptes enregistrés : frais de gestion inférieurs aux fonds distincts classiques</li>
+          <li>PSERIOS déclenché sur dépôts nets seulement, accessible aux nouveaux courtiers</li>
+          <li>Fonds Louisbourg exclusifs (momentum, or/pétrole) + BlackRock, Vanguard, Fidelity, CI, TD</li>
+          <li>Plateforme Vesta : génération automatique TV33, signature électronique OneSpan</li>
+          <li>Remises client visibles dans le compte = transparence et fidélisation</li>
+          <li>Boni Momentum : 15 % an 1 → 30 % an 4+ sur toute la CANPA</li>
+          <li>Compagnie mutuelle — alignement long terme, excellent service</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>AUM plus modeste que les grands assureurs — moins de notoriété grand public</li>
+          <li>CB3 obligatoire pour FHSA (pas de choix CB5)</li>
+          <li>Gamme d'assurance vie plus limitée (focus investissement)</li>
+          <li>Momentum fund exclusif = concentration risque si non-diversifié</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       BMO ASSURANCE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="bmo">
+    <div class="company-header">
+      <div class="co-icon c-bmo">BMO</div>
+      <div>
+        <div class="co-name">BMO Assurance <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">VU · Vie entière · Temporaire · MG · FPG · Barème oct. 2019 (v41.0)</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–5 / 6+</th></tr>
+          <tr><td>VU Gamme Dimension — TRA (jusqu'à prime cible)</td><td class="rate">65 %</td><td>5 % / 3 %</td></tr>
+          <tr><td>VU Gamme Dimension — Nivelé (prime cible)</td><td class="rate">60 %</td><td>5 % / 3 %</td></tr>
+          <tr><td>VU Dimension Prospérité — TRA (prime cible)</td><td class="rate">65 %</td><td>5 % / 0 % + RBA</td></tr>
+          <tr><td class="sub-row">RBA (rémunération sur actif) — Dimension Prospérité</td><td class="sub-row" colspan="2">0,50 % comptes indiciels · 0,25 % CIQ/CIG — dès an 1</td></tr>
+          <tr><td>Temporaire T10</td><td class="rate">40 %</td><td>2 % / 2 %</td></tr>
+          <tr><td>Temporaire T15</td><td class="rate">42,5 %</td><td>2 % / 2 %</td></tr>
+          <tr><td>Temporaire T20 / T25 / T30</td><td class="rate">50 %</td><td>2 % / 2 %</td></tr>
+          <tr><td class="sub-row">Renouvellement terme (11e, 21e année…)</td><td class="sub-row" colspan="2">10 % l'année de renouvellement</td></tr>
+          <tr><td>Vie Entière BMO — 10 primes</td><td class="rate">40 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Vie Entière BMO — 20 primes / À vie</td><td class="rate">50 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Dépôts additionnels (Option paiement additionnel)</td><td class="rate">4 %</td><td colspan="1">—</td></tr>
+          <tr><td>Temporaire à 100 ans (T100)</td><td class="rate">60 %</td><td>5 % / 0 %</td></tr>
+          <tr><td>MG — Prestation du vivant T10</td><td class="rate">45 %</td><td>2 % / 2 %</td></tr>
+          <tr><td>MG — T20 / T75 / T100</td><td class="rate">50 %</td><td>2 % / 2 %</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois linéaire · Vie Entière BMO : 25 mois</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · FPG BMO —</div>
+        <table>
+          <tr><th>Option</th><th>Commission dépôt</th><th>Suivi annuel</th></tr>
+          <tr><td>FPG 75/75 et 75/100 — Frais payables à souscription (FPS)</td><td class="rate">0 – 5,0 %</td><td class="rate">1,00 %</td></tr>
+          <tr><td>FPG 75/75 et 75/100 — Sans frais de vente</td><td class="rate">3,0 %</td><td class="rate">1,00 % dès mois 25</td></tr>
+          <tr><td>FPG 75/75 et 75/100 — Frais vente différés (FVD)</td><td class="rate">5,0 %</td><td>0,50 % (reprise 24 mois)</td></tr>
+          <tr><td>FPG 100/100 — FPS</td><td class="rate">0 – 5,0 %</td><td class="rate">1,00 %</td></tr>
+          <tr><td>Rentes viagères — premiers 100 000 $</td><td class="rate">3,0 %</td><td>—</td></tr>
+          <tr><td>Rentes viagères — excédent</td><td class="rate">1,5 %</td><td>—</td></tr>
+          <tr><td>Rentes certaines — premiers 100 000 $</td><td class="rate">2,0 %</td><td>—</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li><strong>VU Dimension Prospérité</strong> : RBA dès an 1 sur l'actif — revenu récurrent immédiat même sans nouveaux dépôts</li>
+          <li>VU TRA à <strong>65 %</strong> an 1 — l'une des commissions VU les plus élevées en industrie</li>
+          <li>T100 à 60 % — excellent pour besoin de protection viagère permanente à coût prévisible</li>
+          <li>Vie Entière BMO (20 primes) : valeur de rachat rapide, dépôts additionnels à 4 %</li>
+          <li>MG gamme complète (T10 à T100), commissions stables 2 % à vie</li>
+          <li>FPG BMO : suivi 1 % immédiat (FPS) — revenu récurrent dès le 1er mois</li>
+          <li>Barème de remplacement interne progressif (25-75-50-25 % selon ancienneté)</li>
+          <li>Marque bancaire — crédibilité client très forte pour produits d'investissement</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Banque = possible conflit de canal (distribution directe aux clients BMO)</li>
+          <li>Barème VU daté d'octobre 2019 — vérifier les mises à jour avec le représentant</li>
+          <li>FPG 100/100 : suivi 0,85-1,0 % selon catégorie — vérifier l'option disponible</li>
+          <li>Pas de produit PAR (participante) dans le portefeuille BMO Assurance</li>
+          <li>Gamme DI non offerte — ne couvre pas l'invalidité individuelle</li>
+          <li>Récupération sur polices conseillers : 30 mois à 100 %, 31-60 mois à 50 %</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       CANADA VIE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="canadavie">
+    <div class="company-header">
+      <div class="co-icon c-canadavie">CV</div>
+      <div>
+        <div class="co-name">Canada Vie / Great-West <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">VU · PAR · Temporaire · DI · MG · Fonds distincts · Barème 5101 FR — nov. 2024</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–3 / 4–10 / 11+</th></tr>
+          <tr><td>VU (Vie universelle) — jusqu'à prime cible</td><td class="rate">60 %</td><td>3 % / 3 % / 0 %</td></tr>
+          <tr><td>VU — prime cible à prime maximale</td><td class="rate">8 %</td><td>3 % / 3 % / 0 %</td></tr>
+          <tr><td>PAR Le Réalisateur (vie/20 ans)</td><td class="rate">50 %</td><td>10 % / 2 % / 1 %</td></tr>
+          <tr><td>PAR Le Réalisateur 10 paiements</td><td class="rate">35 %</td><td>10 % / 2 % / 0 %</td></tr>
+          <tr><td>ODS — Option de dépôt supplémentaire (prime prévue)</td><td class="rate">4 %</td><td>4 % / 4 % / 4 %</td></tr>
+          <tr><td>Temporaire Ma Temporaire T10</td><td class="rate">40 %</td><td>3 % / 3 % / 2 %</td></tr>
+          <tr><td>Temporaire Ma Temporaire T15</td><td class="rate">50 %</td><td>3 % / 3 % / 2 %</td></tr>
+          <tr><td>Temporaire Ma Temporaire T20 à T50</td><td class="rate">55 %</td><td>3 % / 3 % / 2 %</td></tr>
+          <tr><td>DI — Protection Niveau de vie / Frais généraux</td><td class="rate">50 %</td><td>2 % / 2 % / 2 %</td></tr>
+          <tr><td>MG PrioritéVie (T75, T100) — sans remboursement prime</td><td class="rate">50 %</td><td>2 % / 2 % / 2 %</td></tr>
+          <tr><td>MG PrioritéVie T10 — sans remboursement prime</td><td class="rate">40 %</td><td>2 % / 2 % / 2 %</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois (100 % → 5 % dégression mensuelle)</td></tr>
+          <tr><td class="sub-row">Récupération PAR Réalisateur (conseiller/lié)</td><td class="sub-row" colspan="2">5 ans (an 1-3 : 100 %, an 4 : 75 %, an 5 : 50 %)</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · Fonds distincts (format papier) —</div>
+        <table>
+          <tr><th>Catégorie</th><th>Commission dépôt</th><th>Suivi mensuel</th></tr>
+          <tr><td>Fonds distincts de la Canada Vie — Actions/Équilibrés (ARC)</td><td class="rate">2,10 %</td><td class="rate">0,0333 % → 0,0667 %</td></tr>
+          <tr><td>Fonds distincts — Actions/Équilibrés (FAD)</td><td class="rate">3,50 %</td><td>0,0333 %</td></tr>
+          <tr><td>Fonds distincts — Actions/Équilibrés (AFA)</td><td class="rate">0–5 % négocié</td><td class="rate">0,0667 %</td></tr>
+          <tr><td>Police Multi-placements — Équilibrés/Actions</td><td class="rate">3,50 %</td><td>0,0333 %</td></tr>
+          <tr><td>Rente immédiate viagère — premiers 100 000 $</td><td class="rate">2,40 %</td><td>—</td></tr>
+          <tr><td>Rente immédiate viagère — 100–200 k$</td><td class="rate">1,80 %</td><td>—</td></tr>
+          <tr><td>Rente certaine ≤ 10 ans — premiers 100 000 $</td><td class="rate">1,80 %</td><td>—</td></tr>
+          <tr><td>Placements à intérêt garanti (CIG) — 5 ans</td><td class="rate">1,25 %</td><td>—</td></tr>
+          <tr><td class="sub-row">Reprise FDs ARC</td><td class="sub-row" colspan="2">Avant 4e anniversaire (dégression : 2,10 %→0 % sur 48 mois)</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li>Le plus grand assureur vie au Canada — solidité financière maximale</li>
+          <li>Temporaire T20+ à <strong>55 %</strong> an 1 — parmi les plus élevés en temporaire longue durée</li>
+          <li>Gamme complète : VU, PAR, DI, MG, fonds distincts, rentes, collectif</li>
+          <li>DI (Protection Niveau de vie) à 50 % — compétitive avec IA et Beneva</li>
+          <li>Forte capacité de souscription pour grands montants et risques complexes</li>
+          <li>Réputation solide auprès des clients institutionnels et corporatifs</li>
+          <li>Solides produits PAR pour planification successorale (Le Réalisateur)</li>
+          <li>Outils Great-West Life + London Life intégrés</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Service aux courtiers parfois lent pour les cas courants</li>
+          <li>VU : commission 0 % à l'an 11+ (pas de suivi à long terme)</li>
+          <li>PAR 10 paiements à 35 % — inférieur à certains concurrents (ParPlus AV = 55 %)</li>
+          <li>Processus de souscription plus rigide comparé à certains concurrents</li>
+          <li>Récupération PAR sur conseillers/liés : 5 ans — long et strict</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       EMPIRE VIE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="empire">
+    <div class="company-header">
+      <div class="co-icon c-empire">EV</div>
+      <div>
+        <div class="co-name">Empire Vie <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">PAR · VU · Temporaire · MG · FPG · CIG · Barème sept. 2025</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–5 / 6+</th></tr>
+          <tr><td>PAR Optimax Patrimoine — 100 primes / 20 primes</td><td class="rate">50 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>PAR Optimax Patrimoine — 10 primes</td><td class="rate">35 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>PAR Optimax Patrimoine — 8 primes</td><td class="rate">25 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>APUI / ODA (Option de dépôt additionnel)</td><td class="rate">4 %</td><td>—</td></tr>
+          <tr><td>VU — Solution TRA (Vie universelle)</td><td class="rate">25 %</td><td>10 % / 10 %</td></tr>
+          <tr><td>Temporaire T10 (Solution 10)</td><td class="rate">42,5 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Temporaire T15 (Solution 15)</td><td class="rate">45 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Temporaire T20 / T25 (Solution 20/25)</td><td class="rate">45 % / 47,5 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Temporaire T30 (Solution 30)</td><td class="rate">50 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Temporaire à 100 ans (Solution 100)</td><td class="rate">55 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>MG Protection MG Plus 10 / 20 / 75 / 100</td><td class="rate">45 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Protection vie garantie (émission garantie)</td><td class="rate">35 %</td><td>5 % / 2 %</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois · Optimax Patrimoine (conseiller/lié) : 5 ans</td></tr>
+        </table>
+        <br>
+        <div class="section-title">Capacité non médicale</div>
+        <table>
+          <tr><th>Âge</th><th>Limite NME</th></tr>
+          <tr><td>18–50 ans</td><td class="rate">Jusqu'à 2 000 000 $</td></tr>
+          <tr><td>&gt; 500 000 $</td><td class="sub-row">Sélection aléatoire possible</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · FPG &amp; CIG —</div>
+        <table>
+          <tr><th>Option</th><th>Commission dépôt</th><th>Suivi annuel</th></tr>
+          <tr><td>FPG 75/75 &amp; 75/100 &amp; 100/100 — Sans frais</td><td class="rate">1,63 %</td><td class="rate">0,46 % (équilibrés)</td></tr>
+          <tr><td>FPG — Frais d'entrée (0–5 %)</td><td class="rate">0–2,32 %</td><td class="rate">0,46 % (équilibrés)</td></tr>
+          <tr><td>FPG — Catégorie Plus 3.0 — Sans frais</td><td class="rate">1,63 %</td><td class="rate">0,46 % (équilibrés)</td></tr>
+          <tr><td>CIG (intérêt garanti) — 1 an</td><td class="rate">0,25 %</td><td>—</td></tr>
+          <tr><td>CIG — 5 ans</td><td class="rate">1,25 %</td><td>—</td></tr>
+          <tr><td>CIG — 10 ans</td><td class="rate">2,50 %</td><td>—</td></tr>
+          <tr><td>RIPU (rente immédiate) — premiers 100 000 $</td><td class="rate">2,25 %</td><td>—</td></tr>
+          <tr><td>RIPU — 100 000 – 200 000 $</td><td class="rate">1,50 %</td><td>—</td></tr>
+          <tr><td class="sub-row">Reprise FPG sans frais</td><td class="sub-row" colspan="2">36 mois (100 % → 4 % mois 36), exonération 10 %/an</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li><strong>Limites NME parmi les plus élevées</strong> : jusqu'à 2 M$ sans médecin (18–50 ans)</li>
+          <li>Solution 100 (T100) à <strong>55 %</strong> an 1 — excellent pour polices à très long terme</li>
+          <li>Programme d'échange de temporaire : conversion vers terme plus long dans les 7 ans sans nouveau médical</li>
+          <li>Optimax Patrimoine : valeur de rachat rapide dès les premières années</li>
+          <li>MG CI Protect Plus : remboursement de prime à 100 % à 75 ans (RDB)</li>
+          <li>CIG à 2,50 % sur 10 ans — commissions CIG parmi les meilleures</li>
+          <li>Protection vie garantie sans médical 40–75 ans ($50k) — bon pour clients difficiles à assurer</li>
+          <li>FPG Catégorie Plus 3.0 : suivi dès le 1er mois (sans frais)</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Solution TRA (VU) à seulement 25 % an 1 — très faible vs concurrents VU</li>
+          <li>PAR 8 primes à 25 % — option optimale seulement pour clients cherchant valeur de rachat rapide</li>
+          <li>FPG sans frais à 1,63 % — plus faible que Assomption (5,2 %) ou Équitable (5,6 %)</li>
+          <li>Pas de produit DI individuel dans le barème standard</li>
+          <li>Récupération Optimax conseillers/liés : 5 ans — très strict</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       ÉQUITABLE VIE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="equitable">
+    <div class="company-header">
+      <div class="co-icon c-equitable">EQ</div>
+      <div>
+        <div class="co-name">Équitable Vie <span class="badge badge-mutual">Mutuelle</span></div>
+        <div class="co-type">PAR · VU · Temporaire · MG · Fonds distincts · Barème 1912FR — mars 2026</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–5 / 6–10 / 11+</th></tr>
+          <tr><td>PAR Équimax — 20 paiements / Paiements à vie</td><td class="rate">50 %</td><td>5 % / 2 % / 1 %</td></tr>
+          <tr><td>PAR Équimax — 10 paiements</td><td class="rate">35 %</td><td>5 % / 2 % / S.O.</td></tr>
+          <tr><td>ODE (Option de dépôt Excelérateur)</td><td class="rate">4 %</td><td>—</td></tr>
+          <tr><td>VU Générations — CDA TRA (prime cible)</td><td class="rate">65 %</td><td>5 % / 3 % / 1 %</td></tr>
+          <tr><td>VU Générations — CDA uniforme (prime cible)</td><td class="rate">60 %</td><td>3 % / 0 % / 0 %</td></tr>
+          <tr><td class="sub-row">VU — RBA (valeur compte et compte auxiliaire)</td><td class="sub-row" colspan="2">0,25 % dès an 6 (TRA) ou an 1 (uniforme)</td></tr>
+          <tr><td>Temporaire T10</td><td class="rate">40 %</td><td>3 % / 2 % / 2 %</td></tr>
+          <tr><td>Temporaire T20</td><td class="rate">50 %</td><td>3 % / 2 % / 2 %</td></tr>
+          <tr><td>Temporaire T30/65</td><td class="rate">50 %</td><td>5 % / 2 % / 2 %</td></tr>
+          <tr><td>MG ÉquiVivre (T75, T100 vie, 20 pmts)</td><td class="rate">45 %</td><td>2,5 % / 2,5 % / 1 %</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois (100 % mois 1-6 → 0 % mois 25)</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · Fonds distincts FPG —</div>
+        <table>
+          <tr><th>Option (FundSERV)</th><th>Commission initiale</th><th>Suivi annuel</th></tr>
+          <tr><td>CB5 — FPG Équitable (Actions/Équilibrés)</td><td class="rate">5,60 %</td><td class="rate">0,504 % dès mois 13</td></tr>
+          <tr><td>CB3 — FPG Équitable (Actions/Équilibrés)</td><td class="rate">3,50 %</td><td class="rate">0,504 % dès mois 49</td></tr>
+          <tr><td>FAI (Frais d'acquisition initiaux)</td><td class="rate">0–5 %</td><td class="rate">1,00 %</td></tr>
+          <tr><td>Solutions indispensables II (dépôts subséquents)</td><td class="rate highlight">6,00 %</td><td>0,504 % dès mois 1</td></tr>
+          <tr><td class="sub-row">Frais mensuels de gestion (MER) client</td><td class="sub-row" colspan="2">~4 % (industrie : 8–9 %) — avantage client majeur</td></tr>
+          <tr><td class="sub-row">Reprise CB5</td><td class="sub-row" colspan="2">60 mois (100 % → 28 % au mois 60), exonération 10 %/an</td></tr>
+          <tr><td class="sub-row">Reprise CB3</td><td class="sub-row" colspan="2">36 mois (100 % → 4 % mois 36)</td></tr>
+        </table>
+        <br>
+        <div class="section-title">Programme Elite Advisor</div>
+        <table>
+          <tr><th>Condition</th><th>Boni</th></tr>
+          <tr><td>1,25 M$ nouveaux dépôts / an</td><td class="rate">+1 % sur tous les dépôts</td></tr>
+          <tr><td>Maintien 750 k$ annuels</td><td class="rate">Boni maintenu</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li><strong>DSI (Solutions indispensables II) à 6,00 %</strong> sur dépôts subséquents — exceptionnel en industrie</li>
+          <li>CB5 à 5,60 % — parmi les meilleurs taux CB5 au Canada</li>
+          <li>Frais de gestion clients à ~4 % vs 8–9 % industrie = avantage concurrentiel majeur</li>
+          <li>Reprise CB3 limitée à 36 mois (vs Sun Life 5 ans)</li>
+          <li>PAR Équimax : Bâtisseur de patrimoine + Accumulateur de capital — deux options distinctes</li>
+          <li>VU TRA à 65 % + RBA 0,25 % dès an 6 — excellent combo commission initiale + récurrent</li>
+          <li>51 fonds en 75/75 et 75/100, 38 en 100/100 — excellent choix de garanties</li>
+          <li>Programme Elite Advisor accessible dès 1,25 M$ en nouveaux dépôts</li>
+          <li>Bonne option pour les fumeurs (alternative à IA)</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Reprise CB5 sur 60 mois — la plus longue en industrie pour les fonds distincts</li>
+          <li>Processus de demande plus long que IA pour émission standard</li>
+          <li>Moins reconnu par les clients grand public que Manulife ou Canada Vie</li>
+          <li>PAR 10 paiements à 35 % — non exceptionnel</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       HUMANIA
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="humania">
+    <div class="company-header">
+      <div class="co-icon c-humania">HU</div>
+      <div>
+        <div class="co-name">Humania Assurance <span class="badge badge-mutual">Mutuelle</span></div>
+        <div class="co-type">Invalidité · Terme · Sans médecin · Assurance enfant · +150 ans d'histoire</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-title">Produits clés</div>
+        <table>
+          <tr><th>Produit</th><th>Particularités</th></tr>
+          <tr><td>Hugo (terme vie)</td><td class="rate">Top 2 tarification; renouvellement garanti réduit</td></tr>
+          <tr><td>ProSanté (invalidité)</td><td class="rate">Toutes professions couvertes</td></tr>
+          <tr><td>Sans médecin (vie + MG + DI)</td><td class="rate">Un seul questionnaire pour 3 produits</td></tr>
+          <tr><td>Enfant 360</td><td class="rate">T75 + RDB à 15 ans et 75 ans</td></tr>
+          <tr><td>Avenant enfant Hugo</td><td class="rate">~10–12 $/mois tous enfants; 125 k$ garanti à 25 ans</td></tr>
+        </table>
+        <br>
+        <div class="section-title">ProSanté — Invalidité (différenciateur clé)</div>
+        <table>
+          <tr><th>Caractéristique</th><th>Détail</th></tr>
+          <tr><td>Professions couvertes</td><td class="rate">TOUTES (mineurs, pilotes, influenceurs, sportifs)</td></tr>
+          <tr><td>Prestation non intégrée</td><td class="rate">2 500 $/mois EN PLUS des autres couvertures</td></tr>
+          <tr><td>Durée non-intégration</td><td class="rate">3 ans</td></tr>
+          <tr><td>Périodes de carence</td><td class="rate">14 jours à 2 ans</td></tr>
+          <tr><td>Frais généraux entreprise</td><td class="rate">Combinable avec DI perso sur 1 demande</td></tr>
+        </table>
+        <br>
+        <div class="section-title">Sans médecin</div>
+        <table>
+          <tr><th>Caractéristique</th><th>Détail</th></tr>
+          <tr><td>Vérification MIB</td><td class="rate">AUCUNE (avantage unique)</td></tr>
+          <tr><td>Émission</td><td class="rate">Instantanée — confirmation par courriel</td></tr>
+          <tr><td>Paiement</td><td class="rate">Carte de crédit acceptée (sans frais)</td></tr>
+          <tr><td>Maladies préexistantes</td><td class="rate">Couvertes après 24 mois d'exclusion</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li><strong>ProSanté DI : toutes professions assurées</strong> — unique en marché (mineurs, pilotes, influenceurs, sportifs professionnels)</li>
+          <li>Prestation DI <strong>non intégrée</strong> : 2 500 $/mois versés EN PLUS de CSST ou assurance collective (pendant 3 ans)</li>
+          <li>Hugo terme : top 2 tarifaire; tarification non-linéaire (1 M$ &lt; double du 500 k$)</li>
+          <li>Avenant enfant universel : un seul avenant couvre tous les enfants (nés et adoptés), garanti 125 k$ sans médecin à 25 ans</li>
+          <li>Modèle 100 % courtiers — aucune concurrence directe avec vos clients</li>
+          <li>Aucune vérification MIB pour sans médecin</li>
+          <li>Vente croisée instantanée : approuvé Hugo standard → offre automatique MG + DI dette</li>
+          <li>Enfant 360 : RDB à 15 ans et 75 ans, prime ~8–12 $/mois</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Pas de produit PAR (vie participante) — niche spécialisée</li>
+          <li>Pas de fonds distincts — ne couvre pas le besoin investissement</li>
+          <li>Barème de commissions non disponible dans ce document (à demander à Michael)</li>
+          <li>Moins connu du grand public que Manulife ou Canada Vie</li>
+          <li>Taille plus petite = capacité de souscription limitée pour très grands montants</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       INDUSTRIAL ALLIANCE (IA)
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="ia">
+    <div class="company-header">
+      <div class="co-icon c-ia">IA</div>
+      <div>
+        <div class="co-name">iA Groupe Financier <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">VU · PAR · Terme · DI · Fonds distincts · Familles et marché intermédiaire</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-title">Barème — Produits assurance (barème 425F — à confirmer)</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>Récupération</th></tr>
+          <tr><td>Vie Universelle TRA</td><td class="rate">Confirmer avec représentant</td><td>24 mois</td></tr>
+          <tr><td>PAR (VU participante)</td><td class="rate">Confirmer avec représentant</td><td>24 mois</td></tr>
+          <tr><td>Temporaire</td><td class="rate">Confirmer avec représentant</td><td>24 mois</td></tr>
+          <tr><td>Maladies graves</td><td class="rate">Confirmer avec représentant</td><td>24 mois</td></tr>
+          <tr><td>Invalidité</td><td class="rate">Confirmer avec représentant</td><td>24 mois</td></tr>
+        </table>
+        <br>
+        <div class="note">Barème détaillé dans le fichier <em>Barème de rémunération 425F</em>. Contacter votre représentant IA pour les taux MGA actuels.</div>
+        <br>
+        <div class="section-title">Vie Universelle TRA — Design optimal</div>
+        <table>
+          <tr><th>Principe</th><th>Recommandation</th></tr>
+          <tr><td>Scénario défavorable</td><td class="rate">Illustrer à 4 % croissance</td></tr>
+          <tr><td>Scénario favorable</td><td class="rate">Illustrer à 6–8 % croissance</td></tr>
+          <tr><td>Stratégie prime</td><td class="rate">Maximiser tôt = réserve contre volatilité</td></tr>
+          <tr><td>Profil client idéal</td><td class="rate">30–40 ans, croissance ou agressif</td></tr>
+          <tr><td>OACA</td><td class="rate">Augmentation auto prestation décès</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li><strong>Souscription rapide</strong> : 95 % acceptés automatiquement par le système pour clients en santé</li>
+          <li>Suite complète d'avenants — le plus complet en marché pour VU</li>
+          <li>Tarification compétitive sur VU TRA</li>
+          <li>Niche idéale : familles et marché intermédiaire</li>
+          <li>Flexibilité des primes VU : ajustables entre COI minimum et maximum exempté d'impôt</li>
+          <li>Congé de prime disponible (valeur de rachat finance le COI temporairement)</li>
+          <li>Prêts sur police possibles (remboursement non obligatoire)</li>
+          <li>IA = go-to carrier pour VU selon les formateurs en industrie</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>VU = produit à risque marché — inadapté aux clients prudents ou besoin de levier garanti</li>
+          <li>COI TRA augmente avec l'âge — risque de défaillance si rendements insuffisants</li>
+          <li>Pour levier court terme : PAR préférable (prêts plus prévisibles)</li>
+          <li>Barème exact à valider avec représentant (version 2019)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MANULIFE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="manulife">
+    <div class="company-header">
+      <div class="co-icon c-manulife">MA</div>
+      <div>
+        <div class="co-name">Manulife <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">PAR · VU · Terme · MG · Invalidité · Synergy · Fonds distincts · Vitalité · Barème juill. 2025</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–3 / 4–10 / 11+</th></tr>
+          <tr><td>PAR 10 versements</td><td class="rate">35 %</td><td>10 % / 2 % / 0 %</td></tr>
+          <tr><td>PAR 20 versements</td><td class="rate">50 %</td><td>10 % / 2 %+ / 2 %</td></tr>
+          <tr><td>PAR 90 versements / 100 versements (à vie)</td><td class="rate">50 %</td><td>10 % / 2 %+ / 2 %</td></tr>
+          <tr><td>APUI (ajouts de prime PAR)</td><td class="rate">5 %</td><td>—</td></tr>
+          <tr><td>VU Manuvie — avec Vitalité Plus</td><td class="rate highlight">66,67 %</td><td>3 % (renouvellements dépôts)</td></tr>
+          <tr><td>VU Manuvie — sans Vitalité</td><td class="rate">60,00 %</td><td>3 % (renouvellements dépôts)</td></tr>
+          <tr><td>Temporaire Famille T10 — avec Vitalité+</td><td class="rate">44,44 %</td><td>—</td></tr>
+          <tr><td>Temporaire Famille T10 — sans Vitalité</td><td class="rate">40,00 %</td><td>—</td></tr>
+          <tr><td>Temporaire T20 — avec Vitalité+</td><td class="rate">55,56 %</td><td>—</td></tr>
+          <tr><td>Temporaire T20 / T65 — sans Vitalité</td><td class="rate">50,00 %</td><td>—</td></tr>
+          <tr><td>Synergy (Vie + MG + DI combiné)</td><td class="rate">40 %</td><td>3 % renouvellement</td></tr>
+          <tr><td>MG Chèque-vie</td><td class="rate">50 %</td><td>2 % renouvellement</td></tr>
+          <tr><td>Vie émission garantie</td><td class="rate">35 %</td><td>3 % renouvellement</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois standard · PAR conseiller/lié : contacter représentant</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · Fonds distincts MPPM —</div>
+        <table>
+          <tr><th>Option</th><th>Commission dépôt</th><th>Suivi annuel</th></tr>
+          <tr><td>Fonds distincts MPPM — 75/75 / 75/100</td><td class="rate">3 % upfront</td><td class="rate">0,25–1,00 %</td></tr>
+          <tr><td class="sub-row">Récupération</td><td class="sub-row" colspan="2">24 mois standard</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Boni courtier — Programme Vitalité —</div>
+        <table>
+          <tr><th>Condition</th><th>Boni</th></tr>
+          <tr><td>10+ polices vie/MG vendues (an 1)</td><td class="rate">+15 % sur commissions</td></tr>
+          <tr><td>Maintien du volume annuel</td><td class="rate">+5 %/an jusqu'à +35 %</td></tr>
+          <tr><td>10+ polices avec Vitalité</td><td class="rate">1 500 $ boni supplémentaire</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-subtitle">— Programme Vitalité — Client —</div>
+        <table>
+          <tr><th>Statut</th><th>Réduction prime</th></tr>
+          <tr><td>Bronze</td><td class="rate">0 %</td></tr>
+          <tr><td>Argent</td><td class="rate">5 %</td></tr>
+          <tr><td>Or</td><td class="rate">10 %</td></tr>
+          <tr><td>Platine</td><td class="rate">15 %</td></tr>
+        </table>
+        <div class="divider"></div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li><strong>Programme Vitalité</strong> : réduction prime jusqu'à 15 % + récompenses (Garmin, Apple Watch, 50 % Expedia)</li>
+          <li>VU Manuvie avec Vitalité+ : <strong>66,67 %</strong> an 1 — la meilleure commission VU en industrie</li>
+          <li>Boni courtier cumulatif : jusqu'à +35 % sur commissions après volume</li>
+          <li>1 500 $ bonus additionnel pour 10 polices Vitalité</li>
+          <li>Synergy : 3-en-1 (Vie + MG + DI) sur une seule police</li>
+          <li>Fort en PAR pour clients hauts de gamme</li>
+        </ul>
+        <div class="divider"></div>
+        <div class="section-title">Clients idéaux</div>
+        <ul class="pts forts">
+          <li>Jeunes actifs intéressés par la santé et les récompenses (Vitalité)</li>
+          <li>Clients hauts de gamme pour produits PAR complexes</li>
+          <li>Volume élevé de polices pour maximiser les boni courtier</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>PAR 10 paiements : an 1 à seulement <strong>35 %</strong> — le plus bas parmi les PAR</li>
+          <li>Mauvais service courtier pour petits dossiers</li>
+          <li>Synergy nécessite outil Tour Express séparé (complexité opérationnelle)</li>
+          <li>Vitalité = prime variable : peut être difficile à expliquer aux clients</li>
+          <li>Boni courtier déclenché seulement à 10 polices/an</li>
+          <li>Fonds distincts MPPM moins compétitifs que Assomption/Équitable en commission initiale</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       UV ASSURANCE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="uv">
+    <div class="company-header">
+      <div class="co-icon c-uv">UV</div>
+      <div>
+        <div class="co-name">UV Assurance <span class="badge badge-mutual">Mutuelle</span></div>
+        <div class="co-type">Vie Entière · PAR · Temporaire · MG · CPG · Rentes · Annexe A (23-11)</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–5 / 6+</th></tr>
+          <tr><td>L'Adaptable (Vie Entière participante)</td><td class="rate">55 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Vie Entière Valeurs Élevées</td><td class="rate">55 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>Vie Entière payable à 100 ans</td><td class="rate">55 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>L'Adapsanté (MG)</td><td class="rate">55 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>L'Adapsanté Juvénile</td><td class="rate">55 %</td><td>5 % / 2 %</td></tr>
+          <tr><td>T-10 Supérieur+</td><td class="rate">45 %</td><td>5 % / 2 % (15 % à 11e an)</td></tr>
+          <tr><td>T-15 Supérieur+</td><td class="rate">47,5 %</td><td>5 % / 2 % (15 % à 16e an)</td></tr>
+          <tr><td>T-20 Supérieur+</td><td class="rate">50 %</td><td>5 % / 2 % (15 % à 21e an)</td></tr>
+          <tr><td>T-25 / T-30 Supérieur+</td><td class="rate">50 %</td><td>5 % / 2 % (15 % au renouvellement)</td></tr>
+        </table>
+        <br>
+        <div class="section-title">Règles de rémunération assurance</div>
+        <table>
+          <tr><th>Règle</th><th>Détail</th></tr>
+          <tr><td>Commission 1re année</td><td class="rate">Versée en entier à l'émission</td></tr>
+          <tr><td>Récupération standard</td><td class="rate">24 mois à 4,2 %/mois</td></tr>
+          <tr><td>Commission acquise à 100 %</td><td class="rate">Après 24 mois</td></tr>
+          <tr><td>Affaires personnelles (soi/famille)</td><td class="rate" style="color:var(--red);">60 mois à 1,66 %/mois</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · CPG &amp; Rentes (Annexe A) —</div>
+        <table>
+          <tr><th>Produit</th><th>Commission</th></tr>
+          <tr><td>L'Uniflex et EPUV (CPG REER/CRI/CELI)</td><td class="rate">0,20 % × durée (en années)</td></tr>
+          <tr><td>Uniflex 10 ans à taux progressif</td><td class="rate">2,00 % du montant investi</td></tr>
+          <tr><td>Uniflex 10 (CPG 10 ans, 2 versements)</td><td class="rate">1 % émission + 1 % après 5 ans</td></tr>
+          <tr><td>Uniflex Boursier (indiciel)</td><td class="rate">3,00 % du montant investi</td></tr>
+          <tr><td>Compte à intérêt quotidien</td><td class="rate">Aucune commission</td></tr>
+          <tr><td>Rentes certaines / viagères / réversibles</td><td class="rate">3,00 % jusqu'à 100 000 $</td></tr>
+          <tr><td class="sub-row">Rentes — excédent de 100 000 $</td><td class="sub-row">1,00 % sur l'excédent</td></tr>
+          <tr><td class="sub-row">Bonification possible</td><td class="sub-row">Réduire commission = bonifier taux client</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Règles de remplacement assurance</div>
+        <table>
+          <tr><th>Âge de la police remplacée</th><th>Réduction commission</th></tr>
+          <tr><td>&lt; 24 mois</td><td class="rate" style="color:var(--red);">100 % (commission annulée)</td></tr>
+          <tr><td>25–36 mois</td><td class="rate" style="color:var(--yellow);">75 % de réduction</td></tr>
+          <tr><td>&gt; 36 mois</td><td class="rate" style="color:var(--green);">Aucune réduction</td></tr>
+        </table>
+        <div class="divider"></div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li>Vie Entière (Adaptable) à <strong>55 %</strong> an 1 — excellent pour PAR non participante</li>
+          <li>MG Adapsanté à <strong>55 %</strong> — l'une des commissions MG les plus élevées en marché</li>
+          <li>Commission 1re année versée <strong>en totalité à l'émission</strong> — excellent flux de trésorerie</li>
+          <li>Temporaires avec boni de renouvellement au renouvellement du terme (15 %)</li>
+          <li>Rentes à 3 % — commission compétitive pour les montants standards</li>
+          <li>Uniflex Boursier à 3 % — commissions CPG les plus compétitives</li>
+          <li>Compagnie mutuelle — alignement long terme avec courtiers</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li><strong>Règle de remplacement sévère</strong> : 100 % de réduction si police &lt;24 mois — attention aux transferts de clients</li>
+          <li>Affaires personnelles (soi/famille) : chargeback sur 60 mois (très long)</li>
+          <li>Pas de fonds distincts — ne couvre pas le besoin investissement en ségrégués</li>
+          <li>Notoriété nationale plus limitée que les grands assureurs</li>
+          <li>Uniflex (CPG) : commission dépend de la durée (0,20 % × durée — faible pour courtes durées)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       BENEVA
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="beneva">
+    <div class="company-header">
+      <div class="co-icon c-beneva">BN</div>
+      <div>
+        <div class="co-name">Bénéva <span class="badge badge-mutual">Mutuelle</span></div>
+        <div class="co-type">Assurance vie · Invalidité · Fonds distincts · Guide de rémunération juill. 2024</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-title">Barème — Assurance &amp; Placement</div>
+        <table>
+          <tr><th>Produit</th><th>Commission</th></tr>
+          <tr><td>Voir Guide de rémunération juillet 2024</td><td class="sub-row">Contacter représentant Bénéva</td></tr>
+        </table>
+        <br>
+        <div class="note">Le barème complet se trouve dans le <em>Guide de rémunération — courtier — juillet 2024</em>. Bénéva offre des produits d'assurance vie, invalidité, maladies graves et fonds distincts. Contacter votre représentant pour les taux MGA exacts.</div>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li>Avenant d'assurabilité garantie — mentionné comme différenciateur clé en formation</li>
+          <li>Compagnie mutuelle (fusion La Capitale + SSQ) — forte solidité financière québécoise</li>
+          <li>Gamme complète : vie, DI, MG, fonds distincts, collectif</li>
+          <li>Fort ancrage québécois et francophone</li>
+          <li>Service client réputé dans le marché québécois</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Fusion récente (La Capitale + SSQ) — intégration systèmes en cours</li>
+          <li>Barème exact non disponible dans ce document — à valider avec représentant</li>
+          <li>Présence plus limitée hors Québec</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SUN LIFE
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="sunlife">
+    <div class="company-header">
+      <div class="co-icon c-sunlife">SL</div>
+      <div>
+        <div class="co-name">Sun Life <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">PAR · VU · Temporaire · MG · FPG · CPG · Barème AGP — 9 févr. 2026</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-subtitle">— Assurance individuelle —</div>
+        <table>
+          <tr><th>Produit</th><th>An 1</th><th>An 2–3 / 4+ / 11+</th></tr>
+          <tr><td>PAR Vie Protection (paiements à vie / 20 ans)</td><td class="rate">50 %</td><td>5 % / 2 % / 2 %</td></tr>
+          <tr><td>PAR Vie Protection 10 paiements</td><td class="rate">35 %</td><td>5 % / 2 % / 2 %</td></tr>
+          <tr><td>PAR Garantie Prime Plus (dépôts additionnels)</td><td class="rate">4 %</td><td>4 % / 4 % / 4 %</td></tr>
+          <tr><td>PAR Vie Capitalisation (paiements à vie / 20 ans)</td><td class="rate">25 %</td><td>10 % / 10 % / 10 %</td></tr>
+          <tr><td>VU Vie universelle Sun Life II (TRA, à vie)</td><td class="rate">60 %</td><td>3 % / 3 % / 3 %</td></tr>
+          <tr><td>VU — primes limitées 10 ans</td><td class="rate">32 %</td><td>3 % / 3 % / 3 %</td></tr>
+          <tr><td>VU — primes limitées 20 ans</td><td class="rate">45 %</td><td>3 % / 3 % / 3 %</td></tr>
+          <tr><td>Temporaire Évolution T10</td><td class="rate">40 %</td><td>3 % / 3 % / 2 %</td></tr>
+          <tr><td>Temporaire Évolution T15</td><td class="rate">42,5 %</td><td>3 % / 3 % / 2 %</td></tr>
+          <tr><td>Temporaire Évolution T20 à T40</td><td class="rate">50 %</td><td>3 % / 3 % / 2 %</td></tr>
+          <tr><td>MG Assurance maladies graves T10</td><td class="rate">45 %</td><td>2 % / 2 % / 2 %</td></tr>
+          <tr><td>MG T75 / T100 (vie)</td><td class="rate">50 %</td><td>2 % / 2 % / 2 %</td></tr>
+          <tr><td>Assurance-santé personnelle (papier)</td><td class="rate">22,5 %</td><td>5 % / 5 % / 5 %</td></tr>
+          <tr><td>Assurance de soins de longue durée</td><td class="rate">40 %</td><td>2 % / 2 % / 2 %</td></tr>
+          <tr><td class="sub-row">Récupération standard</td><td class="sub-row" colspan="2">24 mois (100 % mois 1-6, dégression de 5 %/mois par la suite)</td></tr>
+          <tr><td class="sub-row">Récupération Vie Capitalisation (conseiller/lié)</td><td class="sub-row" colspan="2">5 ans (an 1-3 : 100 %, an 4 : 75 %, an 5 : 50 %)</td></tr>
+        </table>
+
+        <div class="divider"></div>
+        <div class="section-subtitle">— Placement · FPG &amp; CPG —</div>
+        <table>
+          <tr><th>Option</th><th>Commission dépôt</th><th>Suivi annuel</th></tr>
+          <tr><td>FPG Sun Life — FPS (frais à souscription) — Actions/Équil.</td><td class="rate">0–5 % négocié</td><td class="rate">1,00 %</td></tr>
+          <tr><td>FPG Sun Life — FSD (frais souscription différés)</td><td class="rate">5,00 %</td><td>0,50 %</td></tr>
+          <tr><td>FPG Sun Life — RCC (reprise commission conseiller)</td><td class="rate">3,00 %</td><td class="rate">1,00 % dès an 3</td></tr>
+          <tr><td>Rente viagère (fonds externes) — premiers 100 000 $</td><td class="rate">3,00 %</td><td>—</td></tr>
+          <tr><td>Rente viagère — tranche 100–300 k$</td><td class="rate">1,50–2,00 %</td><td>—</td></tr>
+          <tr><td>Rente certaine court terme — premiers 100 000 $</td><td class="rate">2,00 %</td><td>—</td></tr>
+          <tr><td>Superflex CPG — 1 an (niveau 1)</td><td class="rate">0,40 %</td><td>—</td></tr>
+          <tr><td>Superflex CPG — 5 ans (niveau 1)</td><td class="rate">2,00 %</td><td>—</td></tr>
+          <tr><td>Superflex CPG — 10 ans+ (niveau 1)</td><td class="rate">4,00 %</td><td>—</td></tr>
+          <tr><td class="sub-row">Reprise FPG FSD</td><td class="sub-row" colspan="2">Pénalité retrait 5 % an 1, 3 % an 2-10 (Vie universelle Sun Life)</td></tr>
+          <tr><td class="sub-row">Reprise FPG RCC</td><td class="sub-row" colspan="2">100 % an 1 · 66,6 % mois 13-18 · 33,3 % mois 19-24</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li>Marque premium reconnue mondialement — forte crédibilité client</li>
+          <li>VU TRA à <strong>60 %</strong> an 1, renouvellement 3 % même an 11+ (contrairement à Canada Vie = 0 %)</li>
+          <li>PAR Vie Protection : 50 % an 1, 5 % an 2-3 — structure long terme attractive</li>
+          <li>FPG RCC : 3 % initial + 1 % suivi dès an 3 — bon équilibre commission/récurrence</li>
+          <li>Superflex CPG 10 ans à 4 % — excellent pour clients placements garantis long terme</li>
+          <li>Gamme complète : PAR, VU, temporaire, MG, santé, CSLD, FPG, CPG</li>
+          <li>Fort en assurance-santé personnelle et soins longue durée</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li><strong>Chargeback Vie Capitalisation conseillers/liés : 5 ans</strong> — très contraignant</li>
+          <li>Tarification premium = primes souvent plus élevées qu'alternatives</li>
+          <li>Service courtier parfois lent sur dossiers courants</li>
+          <li>VU primes limitées 10 ans à seulement 32 % — faible pour ce type</li>
+          <li>PAR Vie Capitalisation an 1 à 25 % — structuré pour rendement long terme, pas commission</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       RBC
+  ══════════════════════════════════════════════════════ -->
+  <div class="company" id="rbc">
+    <div class="company-header">
+      <div class="co-icon c-rbc">RBC</div>
+      <div>
+        <div class="co-name">RBC Assurance <span class="badge badge-stock">Action</span></div>
+        <div class="co-type">Assurance vie · Fonds distincts · Courtage AGP · Tableau févr. 2026</div>
+      </div>
+    </div>
+    <div class="company-body">
+      <div>
+        <div class="section-title">Barème AGP — Courtage (févr. 2026)</div>
+        <table>
+          <tr><th>Produit</th><th>Commission</th></tr>
+          <tr><td>Voir Tableau de commissions AGP 2026</td><td class="sub-row">Contacter représentant RBC</td></tr>
+        </table>
+        <br>
+        <div class="note">Le fichier <em>Tableau de commissions de Courtage (AGP) février 2026</em> contient le barème complet. Contacter votre représentant RBC pour les taux actuels.</div>
+      </div>
+      <div>
+        <div class="section-title">Points forts</div>
+        <ul class="pts forts">
+          <li>Marque RBC — forte crédibilité et confiance client</li>
+          <li>Barème AGP mis à jour février 2026 — tarification récente</li>
+          <li>Produits simplifiés pour clients bancaires existants</li>
+          <li>Fort en assurance hypothécaire et produits de protection de crédit</li>
+          <li>Solidité financière parmi les meilleures au Canada</li>
+        </ul>
+      </div>
+      <div class="full-width">
+        <div class="section-title">Points faibles</div>
+        <ul class="pts faibles" style="columns:2; gap:24px;">
+          <li>Banque = possible conflit de canal (vente directe aux clients)</li>
+          <li>Gamme de produits courtier plus limitée que les assureurs spécialisés</li>
+          <li>Barème exact non disponible dans ce document — à valider</li>
+          <li>Moins compétitif sur produits PAR complexes vs assureurs spécialisés</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="margin-top:40px; padding:20px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); font-size:0.78rem; color:var(--muted); line-height:1.6;">
+    <strong style="color:var(--text);">Sources</strong> — Barèmes PDF : Assomption Vie (juill. 2024), BMO Assurance (425F oct. 2019), Canada Vie (5101 FR nov. 2024), Empire Vie (sept. 2025), Équitable Vie (1912FR mars 2026), Sun Life AGP (févr. 2026), UV Assurance (Annexe A 23-11). Humania, IA, Bénéva, RBC : données de formation / représentants.<br>
+    <strong style="color:var(--text);">Note</strong> — Les taux sont sujets à changement. Toujours confirmer avec votre représentant avant de citer des chiffres à un client. Les règles de récupération (chargeback) s'appliquent selon la politique de chaque assureur. Les taux de commission peuvent varier selon le niveau MGA et les ententes spéciales.
+  </div>
+</main>
+</body>
+</html>
