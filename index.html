@@ -90,6 +90,24 @@
   .legend-item strong { color: var(--text); }
 
   .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  /* ── Calculateur ── */
+  .calc-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 32px; }
+  .calc-box h2 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .calc-box .calc-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 22px; }
+  .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 22px; }
+  .calc-field label { display: block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .calc-field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 1rem; font-weight: 600; outline: none; transition: border .15s; }
+  .calc-field input:focus { border-color: var(--accent); }
+  .calc-quick { display: flex; gap: 6px; margin-top: 6px; }
+  .calc-quick button { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all .15s; }
+  .calc-quick button:hover, .calc-quick button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .calc-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; border-top: 1px solid var(--border); padding-top: 20px; }
+  .calc-result-item { background: var(--surface2); border-radius: 8px; padding: 14px 16px; }
+  .calc-result-item .r-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .calc-result-item .r-value { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+  .calc-result-item.r-total .r-value { color: var(--green); font-size: 1.7rem; }
+  .calc-result-item .r-sub { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
 </style>
 </head>
 <body>
@@ -125,6 +143,89 @@
     <div class="legend-item"><strong>PAR</strong> — Vie participante · <strong>VU</strong> — Vie universelle</div>
     <div class="legend-item"><strong>MG</strong> — Maladies graves · <strong>DI</strong> — Invalidité</div>
   </div>
+
+  <!-- ══ CALCULATEUR DE COMMISSION ══ -->
+  <div class="calc-box">
+    <h2>🧮 Calculateur de commission</h2>
+    <div class="calc-sub">Calculez votre revenu de commission en quelques secondes</div>
+    <div class="calc-grid">
+      <div class="calc-field">
+        <label>Prime mensuelle ($)</label>
+        <input type="number" id="c-prime" placeholder="500" min="0" oninput="calcUpdate()">
+      </div>
+      <div class="calc-field">
+        <label>Prime annuelle ($)</label>
+        <input type="number" id="c-annual" placeholder="6 000" readonly style="opacity:.6;cursor:not-allowed;">
+      </div>
+      <div class="calc-field">
+        <label>Taux de commission (%)</label>
+        <input type="number" id="c-comm" value="50" min="0" max="100" oninput="calcUpdate()">
+        <div class="calc-quick">
+          <button onclick="setComm(40)">40 %</button>
+          <button onclick="setComm(45)">45 %</button>
+          <button onclick="setComm(50)" class="active">50 %</button>
+          <button onclick="setComm(55)">55 %</button>
+          <button onclick="setComm(60)">60 %</button>
+        </div>
+      </div>
+      <div class="calc-field">
+        <label>Taux de bonis (%)</label>
+        <input type="number" id="c-bonis" value="125" min="100" oninput="calcUpdate()">
+        <div class="calc-quick">
+          <button onclick="setBonis(110)">110 %</button>
+          <button onclick="setBonis(115)">115 %</button>
+          <button onclick="setBonis(125)" class="active">125 %</button>
+          <button onclick="setBonis(140)">140 %</button>
+        </div>
+      </div>
+    </div>
+    <div class="calc-results">
+      <div class="calc-result-item">
+        <div class="r-label">Commission de base (an 1)</div>
+        <div class="r-value" id="r-base">—</div>
+        <div class="r-sub" id="r-base-sub">prime annuelle × taux</div>
+      </div>
+      <div class="calc-result-item">
+        <div class="r-label">Bonis additionnel</div>
+        <div class="r-value" id="r-bonusamt">—</div>
+        <div class="r-sub" id="r-bonus-sub">commission × (bonis − 100 %)</div>
+      </div>
+      <div class="calc-result-item r-total">
+        <div class="r-label">Total avec bonis</div>
+        <div class="r-value" id="r-total">—</div>
+        <div class="r-sub" id="r-total-sub">commission × bonis %</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function fmt(n){ return n.toLocaleString('fr-CA',{style:'currency',currency:'CAD',maximumFractionDigits:0}); }
+    function calcUpdate(){
+      const pm = parseFloat(document.getElementById('c-prime').value)||0;
+      const pa = pm*12;
+      document.getElementById('c-annual').value = pa ? pa.toFixed(0) : '';
+      const tc = parseFloat(document.getElementById('c-comm').value)||0;
+      const tb = parseFloat(document.getElementById('c-bonis').value)||100;
+      const base = pa*(tc/100);
+      const bonus = base*((tb-100)/100);
+      const total = base*(tb/100);
+      document.getElementById('r-base').textContent    = pa ? fmt(base)  : '—';
+      document.getElementById('r-bonusamt').textContent= pa ? fmt(bonus) : '—';
+      document.getElementById('r-total').textContent   = pa ? fmt(total) : '—';
+      document.getElementById('r-base-sub').textContent  = pa ? fmt(pa)+' × '+tc+' %' : 'prime annuelle × taux';
+      document.getElementById('r-bonus-sub').textContent = pa ? fmt(base)+' × '+(tb-100)+' %' : 'commission × (bonis − 100 %)';
+      document.getElementById('r-total-sub').textContent = pa ? fmt(base)+' × '+tb+' %' : 'commission × bonis %';
+    }
+    function setComm(v){
+      document.getElementById('c-comm').value=v;
+      document.querySelectorAll('.calc-quick button').forEach(b=>{ if(b.textContent.trim()===v+' %') b.classList.add('active'); else if(['40 %','45 %','50 %','55 %','60 %'].includes(b.textContent.trim())) b.classList.remove('active'); });
+      calcUpdate();
+    }
+    function setBonis(v){
+      document.getElementById('c-bonis').value=v;
+      document.querySelectorAll('.calc-quick button').forEach(b=>{ if(b.textContent.trim()===v+' %') b.classList.add('active'); else if(['110 %','115 %','125 %','140 %'].includes(b.textContent.trim())) b.classList.remove('active'); });
+      calcUpdate();
+    }
+  </script>
 
   <!-- ══════════════════════════════════════════════════════
        ASSOMPTION VIE
