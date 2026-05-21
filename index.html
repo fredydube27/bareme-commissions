@@ -188,12 +188,12 @@
       <div class="calc-result-item">
         <div class="r-label">Bonis additionnel</div>
         <div class="r-value" id="r-bonusamt">—</div>
-        <div class="r-sub" id="r-bonus-sub">commission × (bonis − 100 %)</div>
+        <div class="r-sub" id="r-bonus-sub">commission × bonis %</div>
       </div>
       <div class="calc-result-item r-total">
         <div class="r-label">Total avec bonis</div>
         <div class="r-value" id="r-total">—</div>
-        <div class="r-sub" id="r-total-sub">commission × bonis %</div>
+        <div class="r-sub" id="r-total-sub">base + bonis</div>
       </div>
     </div>
   </div>
@@ -206,14 +206,14 @@
       const tc = parseFloat(document.getElementById('c-comm').value)||0;
       const tb = parseFloat(document.getElementById('c-bonis').value)||100;
       const base = pa*(tc/100);
-      const bonus = base*((tb-100)/100);
-      const total = base*(tb/100);
+      const bonus = base*(tb/100);
+      const total = base+bonus;
       document.getElementById('r-base').textContent    = pa ? fmt(base)  : '—';
       document.getElementById('r-bonusamt').textContent= pa ? fmt(bonus) : '—';
       document.getElementById('r-total').textContent   = pa ? fmt(total) : '—';
       document.getElementById('r-base-sub').textContent  = pa ? fmt(pa)+' × '+tc+' %' : 'prime annuelle × taux';
-      document.getElementById('r-bonus-sub').textContent = pa ? fmt(base)+' × '+(tb-100)+' %' : 'commission × (bonis − 100 %)';
-      document.getElementById('r-total-sub').textContent = pa ? fmt(base)+' × '+tb+' %' : 'commission × bonis %';
+      document.getElementById('r-bonus-sub').textContent = pa ? fmt(base)+' × '+tb+' %' : 'commission × bonis %';
+      document.getElementById('r-total-sub').textContent = pa ? fmt(base)+' + '+fmt(bonus) : 'base + bonis';
     }
     function setComm(v){
       document.getElementById('c-comm').value=v;
